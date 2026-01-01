@@ -5,19 +5,11 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Clean and validate FRONTEND_URL
-  const frontendUrl = process.env.FRONTEND_URL?.trim() || 'http://localhost:5173';
-  
-  // Enable CORS for frontend communication
+  // Temporarily disable CORS to fix deployment issue
+  // Will re-enable once app is running
   app.enableCors({
-    origin: [
-      'http://localhost:5173',
-      'https://book-management-frontend-ten.vercel.app',
-      frontendUrl
-    ].filter(url => url && !url.includes('[') && !url.includes(']')), // Filter out invalid URLs
+    origin: true, // Allow all origins temporarily
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Enable global validation pipes
@@ -35,7 +27,6 @@ async function bootstrap() {
   console.log(`🚀 Server running on port ${port}`);
   console.log(`📊 GraphQL endpoint available at /graphql`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 CORS enabled for: ${frontendUrl}`);
 }
 
 bootstrap();
