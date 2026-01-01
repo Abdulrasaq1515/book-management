@@ -16,14 +16,12 @@ RUN npm install
 # Copy backend source code
 COPY backend/ ./backend/
 
-# Build the backend application
-RUN cd backend && npm run build
+# Set working directory to backend and build
+WORKDIR /app/backend
+RUN npm run build
 
 # Expose port
 EXPOSE 4000
-
-# Set working directory to backend
-WORKDIR /app/backend
 
 # Start the application
 CMD ["npm", "run", "start:prod"]
