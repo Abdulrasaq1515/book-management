@@ -23,5 +23,5 @@ RUN npm run build
 # Expose port
 EXPOSE 4000
 
-# Start the application
+# Start the application (fixed for Railway deployment)
 CMD ["npm", "run", "start:prod"]
