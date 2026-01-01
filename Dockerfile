@@ -4,20 +4,26 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy backend package files
-COPY backend/package*.json ./
+# Copy root package.json for workspace configuration
+COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Copy backend package files
+COPY backend/package*.json ./backend/
+
+# Install dependencies for the entire workspace
+RUN npm install
 
 # Copy backend source code
-COPY backend/ ./
+COPY backend/ ./backend/
 
-# Build the application
-RUN npm run build
+# Build the backend application
+RUN cd backend && npm run build
 
 # Expose port
 EXPOSE 4000
+
+# Set working directory to backend
+WORKDIR /app/backend
 
 # Start the application
 CMD ["npm", "run", "start:prod"]

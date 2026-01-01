@@ -1,97 +1,128 @@
 # Book Dashboard Deployment Guide
 
-## 🚀 Deployment Options
+## 🚨 CRITICAL: Auth0 Configuration Fix
 
-### Option 1: Vercel (Recommended for Frontend) + Railway/Render (Backend)
+### Fix "Grant type 'authorization_code' not allowed" Error
 
-#### Frontend Deployment (Vercel)
-1. **Push to GitHub**: Commit your code to a GitHub repository
-2. **Connect Vercel**: Go to [vercel.com](https://vercel.com) and import your repository
-3. **Configure Build Settings**:
-   - Framework Preset: Vite
-   - Build Command: `cd frontend && npm run build`
-   - Output Directory: `frontend/dist`
-4. **Environment Variables** (in Vercel dashboard):
+The error you're seeing means your Auth0 application is not configured correctly. Follow these steps:
+
+1. **Go to Auth0 Dashboard**: https://manage.auth0.com/
+2. **Navigate to Applications** → Select your application
+3. **Application Settings**:
+   - **Application Type**: Single Page Application (SPA)
+   - **Token Endpoint Authentication Method**: None
+4. **Allowed Callback URLs**: Add your URLs:
    ```
-   VITE_GRAPHQL_URL=https://your-backend-url.com/graphql
-   VITE_AUTH0_DOMAIN=dev-6g2scdjmkku3pjvo.us.auth0.com
-   VITE_AUTH0_CLIENT_ID=your-auth0-client-id
-   VITE_AUTH0_AUDIENCE=https://book-management-api
+   http://localhost:5173, https://your-vercel-app.vercel.app
    ```
+5. **Allowed Logout URLs**: Add your URLs:
+   ```
+   http://localhost:5173, https://your-vercel-app.vercel.app
+   ```
+6. **Allowed Web Origins**: Add your URLs:
+   ```
+   http://localhost:5173, https://your-vercel-app.vercel.app
+   ```
+7. **Advanced Settings** → **Grant Types**: Ensure these are checked:
+   - ✅ Authorization Code
+   - ✅ Refresh Token
+   - ✅ Implicit (for SPA)
 
-#### Backend Deployment (Railway)
-1. **Connect Railway**: Go to [railway.app](https://railway.app) and connect your GitHub repo
-2. **Configure Service**:
-   - Root Directory: `backend`
-   - Build Command: `npm run build`
-   - Start Command: `npm run start:prod`
-3. **Environment Variables** (⚠️ NEVER commit these to GitHub):
+**Save Changes** and test again.
+
+## 🚀 Deployment Steps
+
+### Step 1: Set Up Your Environment Files Locally
+
+```bash
+# Copy example files
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+Edit these files with your actual Auth0 credentials:
+- Domain: `dev-6g2scdjmkku3pjvo.us.auth0.com`
+- Client ID: `oSPM0lIKqEQAyNZRfpW9OUPjFktQSQpN`
+- Audience: `https://book-management-api`
+
+### Step 2: Deploy Backend to Railway
+
+1. **Connect Railway**: Go to [railway.app](https://railway.app)
+2. **New Project** → **Deploy from GitHub repo**
+3. **Select your repository**: `Abdulrasaq1515/book-management`
+4. **Configure Service**:
+   - Service Name: `book-dashboard-backend`
+   - Root Directory: Leave empty (uses Dockerfile)
+5. **Set Environment Variables** in Railway dashboard:
    ```
    NODE_ENV=production
    PORT=4000
-   AUTH0_DOMAIN=your-auth0-domain.auth0.com
+   AUTH0_DOMAIN=dev-6g2scdjmkku3pjvo.us.auth0.com
    AUTH0_AUDIENCE=https://book-management-api
-   AUTH0_CLIENT_ID=your-auth0-client-id
+   AUTH0_CLIENT_ID=oSPM0lIKqEQAyNZRfpW9OUPjFktQSQpN
    FRONTEND_URL=https://your-vercel-app.vercel.app
    DATABASE_PATH=database.sqlite
    ```
 
-## 🔐 Security Best Practices
+### Step 3: Deploy Frontend to Vercel
 
-### Environment Variables
-- ❌ **NEVER** commit `.env`, `.env.production`, or any files with secrets to GitHub
-- ✅ **ALWAYS** set environment variables directly in your deployment platform
-- ✅ **ONLY** commit `.env.example` files with placeholder values
-- ✅ Use your deployment platform's environment variable settings
+1. **Connect Vercel**: Go to [vercel.com](https://vercel.com)
+2. **Import Project** → Select your GitHub repo
+3. **Configure Project**:
+   - Framework Preset: Vite
+   - Root Directory: `frontend`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+4. **Set Environment Variables** in Vercel dashboard:
+   ```
+   VITE_GRAPHQL_URL=https://your-railway-app.railway.app/graphql
+   VITE_AUTH0_DOMAIN=dev-6g2scdjmkku3pjvo.us.auth0.com
+   VITE_AUTH0_CLIENT_ID=oSPM0lIKqEQAyNZRfpW9OUPjFktQSQpN
+   VITE_AUTH0_AUDIENCE=https://book-management-api
+   ```
 
-### Auth0 Security
-- Keep your Auth0 Client Secret secure
-- Only add trusted domains to Auth0 callback URLs
-- Use different Auth0 applications for development and production
+### Step 4: Update Auth0 with Production URLs
 
-## 📋 Environment Variables Summary
+After deployment, update your Auth0 application settings:
+- **Allowed Callback URLs**: Add your production URLs
+- **Allowed Logout URLs**: Add your production URLs  
+- **Allowed Web Origins**: Add your production URLs
 
-### Backend Environment Variables (Set in Railway/Render Dashboard)
-```
-NODE_ENV=production
-PORT=4000
-AUTH0_DOMAIN=your-auth0-domain.auth0.com
-AUTH0_AUDIENCE=https://book-management-api
-AUTH0_CLIENT_ID=your-auth0-client-id
-FRONTEND_URL=https://your-frontend-domain.com
-DATABASE_PATH=database.sqlite
-```
+## 🔧 Troubleshooting
 
-### Frontend Environment Variables (Set in Vercel/Netlify Dashboard)
-```
-VITE_GRAPHQL_URL=https://your-backend-domain.com/graphql
-VITE_AUTH0_DOMAIN=your-auth0-domain.auth0.com
-VITE_AUTH0_CLIENT_ID=your-auth0-client-id
-VITE_AUTH0_AUDIENCE=https://book-management-api
-```
+### Railway Deployment Issues
+- ✅ Uses Dockerfile (fixed monorepo structure)
+- ✅ Proper npm workspace handling
+- ✅ Environment variables set in Railway dashboard
 
-## 🚨 Important Security Notes
+### Auth0 Issues
+- ✅ Application Type: Single Page Application (SPA)
+- ✅ Grant Types: Authorization Code + Refresh Token + Implicit
+- ✅ Callback URLs include both local and production URLs
 
-1. **Never commit environment files**: All `.env*` files are now in `.gitignore`
-2. **Use platform environment variables**: Set secrets directly in Vercel/Railway dashboards
-3. **Rotate secrets if exposed**: If you accidentally committed secrets, rotate them immediately
-4. **Use different credentials for production**: Never use development credentials in production
+### Common Errors
+1. **"Grant type not allowed"** → Fix Auth0 application type to SPA
+2. **"CORS error"** → Add your domain to Auth0 Allowed Web Origins
+3. **"Cannot connect to backend"** → Check Railway environment variables
+4. **"Build failed"** → Check Railway logs for missing dependencies
 
-## 🎯 Quick Deploy Commands
+## 🎯 Quick Commands
 
-### Local Development
 ```bash
-# Copy example files and fill in your values
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-
-# Edit the files with your actual values
-# Then start development
+# Test locally after setting up .env files
 npm run dev
+
+# Build for production
+npm run build
+
+# Test production build locally
+npm run start:prod
 ```
 
-### Build for Production
-```bash
-# Build both frontend and backend
-npm run build
-```
+## 🔐 Security Checklist
+
+- ✅ Environment files removed from GitHub
+- ✅ Secrets set in deployment platform dashboards
+- ✅ Auth0 configured with proper application type
+- ✅ Production URLs added to Auth0 settings
+- ✅ Different credentials for development vs production (recommended)
