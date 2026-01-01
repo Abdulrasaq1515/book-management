@@ -15,7 +15,7 @@
    ```
    VITE_GRAPHQL_URL=https://your-backend-url.com/graphql
    VITE_AUTH0_DOMAIN=dev-6g2scdjmkku3pjvo.us.auth0.com
-   VITE_AUTH0_CLIENT_ID=oSPM0lIKqEQAyNZRfpW9OUPjFktQSQpN
+   VITE_AUTH0_CLIENT_ID=your-auth0-client-id
    VITE_AUTH0_AUDIENCE=https://book-management-api
    ```
 
@@ -25,128 +25,73 @@
    - Root Directory: `backend`
    - Build Command: `npm run build`
    - Start Command: `npm run start:prod`
-3. **Environment Variables**:
+3. **Environment Variables** (⚠️ NEVER commit these to GitHub):
    ```
    NODE_ENV=production
    PORT=4000
-   AUTH0_DOMAIN=dev-6g2scdjmkku3pjvo.us.auth0.com
+   AUTH0_DOMAIN=your-auth0-domain.auth0.com
    AUTH0_AUDIENCE=https://book-management-api
-   AUTH0_CLIENT_ID=oSPM0lIKqEQAyNZRfpW9OUPjFktQSQpN
+   AUTH0_CLIENT_ID=your-auth0-client-id
    FRONTEND_URL=https://your-vercel-app.vercel.app
    DATABASE_PATH=database.sqlite
    ```
 
-### Option 2: Netlify (Frontend) + Heroku (Backend)
+## 🔐 Security Best Practices
 
-#### Frontend Deployment (Netlify)
-1. **Connect Repository**: Link your GitHub repo to Netlify
-2. **Build Settings**:
-   - Base Directory: `frontend`
-   - Build Command: `npm run build`
-   - Publish Directory: `frontend/dist`
-3. **Environment Variables**: Same as Vercel above
+### Environment Variables
+- ❌ **NEVER** commit `.env`, `.env.production`, or any files with secrets to GitHub
+- ✅ **ALWAYS** set environment variables directly in your deployment platform
+- ✅ **ONLY** commit `.env.example` files with placeholder values
+- ✅ Use your deployment platform's environment variable settings
 
-#### Backend Deployment (Heroku)
-1. **Create Heroku App**: `heroku create your-app-name`
-2. **Add Buildpack**: `heroku buildpacks:set heroku/nodejs`
-3. **Configure Environment Variables**: Use `heroku config:set`
-4. **Deploy**: `git push heroku main`
-
-### Option 3: Docker Deployment
-
-#### Backend Dockerfile
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-EXPOSE 4000
-CMD ["npm", "run", "start:prod"]
-```
-
-#### Frontend Dockerfile
-```dockerfile
-FROM node:18-alpine as build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-## 🔧 Pre-Deployment Checklist
-
-### Auth0 Configuration
-1. **Update Auth0 Application Settings**:
-   - Add production URLs to Allowed Callback URLs
-   - Add production URLs to Allowed Logout URLs
-   - Add production URLs to Allowed Web Origins
-   - Add production URLs to Allowed Origins (CORS)
-
-### Database Considerations
-- **Development**: SQLite (current setup)
-- **Production**: Consider PostgreSQL or MySQL for better performance
-- **Migration**: Update TypeORM configuration for production database
-
-### Security
-- [ ] Remove console.log statements from production code
-- [ ] Set up proper error handling
-- [ ] Configure rate limiting
-- [ ] Set up monitoring and logging
+### Auth0 Security
+- Keep your Auth0 Client Secret secure
+- Only add trusted domains to Auth0 callback URLs
+- Use different Auth0 applications for development and production
 
 ## 📋 Environment Variables Summary
 
-### Backend (.env.production)
+### Backend Environment Variables (Set in Railway/Render Dashboard)
 ```
 NODE_ENV=production
 PORT=4000
-AUTH0_DOMAIN=dev-6g2scdjmkku3pjvo.us.auth0.com
+AUTH0_DOMAIN=your-auth0-domain.auth0.com
 AUTH0_AUDIENCE=https://book-management-api
-AUTH0_CLIENT_ID=oSPM0lIKqEQAyNZRfpW9OUPjFktQSQpN
+AUTH0_CLIENT_ID=your-auth0-client-id
 FRONTEND_URL=https://your-frontend-domain.com
 DATABASE_PATH=database.sqlite
 ```
 
-### Frontend (.env.production)
+### Frontend Environment Variables (Set in Vercel/Netlify Dashboard)
 ```
 VITE_GRAPHQL_URL=https://your-backend-domain.com/graphql
-VITE_AUTH0_DOMAIN=dev-6g2scdjmkku3pjvo.us.auth0.com
-VITE_AUTH0_CLIENT_ID=oSPM0lIKqEQAyNZRfpW9OUPjFktQSQpN
+VITE_AUTH0_DOMAIN=your-auth0-domain.auth0.com
+VITE_AUTH0_CLIENT_ID=your-auth0-client-id
 VITE_AUTH0_AUDIENCE=https://book-management-api
 ```
 
+## 🚨 Important Security Notes
+
+1. **Never commit environment files**: All `.env*` files are now in `.gitignore`
+2. **Use platform environment variables**: Set secrets directly in Vercel/Railway dashboards
+3. **Rotate secrets if exposed**: If you accidentally committed secrets, rotate them immediately
+4. **Use different credentials for production**: Never use development credentials in production
+
 ## 🎯 Quick Deploy Commands
 
-### Local Production Test
+### Local Development
 ```bash
-# Backend
-cd backend
-npm run build
-npm run start:prod
+# Copy example files and fill in your values
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 
-# Frontend
-cd frontend
-npm run build
-npm run preview
+# Edit the files with your actual values
+# Then start development
+npm run dev
 ```
 
 ### Build for Production
 ```bash
-# Root directory
-npm run build:all
+# Build both frontend and backend
+npm run build
 ```
-
-## 📞 Support
-
-If you encounter issues during deployment:
-1. Check environment variables are correctly set
-2. Verify Auth0 configuration matches your domains
-3. Ensure CORS settings allow your frontend domain
-4. Check logs for specific error messages
