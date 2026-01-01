@@ -28,8 +28,8 @@ import { HealthController } from './health.controller';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // Auto-generate schema
       sortSchema: true, // Sort schema alphabetically for consistency
-      playground: process.env.NODE_ENV === 'development', // Only enable in development
-      introspection: process.env.NODE_ENV === 'development', // Only enable in development
+      playground: true, // Enable GraphQL playground
+      introspection: true, // Enable introspection
       context: ({ req }) => ({ req }), // Pass request to context for auth
     }),
 
@@ -38,7 +38,7 @@ import { HealthController } from './health.controller';
       type: 'sqlite',
       database: process.env.DATABASE_PATH || 'database.sqlite',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: process.env.NODE_ENV === 'development', // Only auto-sync in development
+      synchronize: true, // Enable for SQLite in production (safe for small apps)
       logging: process.env.NODE_ENV === 'development', // Log queries in dev mode
     }),
 
