@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { BooksModule } from './books/books.module';
 import { AuthModule } from './auth/auth.module';
+import { HealthController } from './health.controller';
 
 /**
  * Root application module
@@ -45,5 +46,6 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
     BooksModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
