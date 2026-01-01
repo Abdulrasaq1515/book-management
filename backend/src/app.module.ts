@@ -28,8 +28,8 @@ import { HealthController } from './health.controller';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // Auto-generate schema
       sortSchema: true, // Sort schema alphabetically for consistency
-      playground: true, // Enable GraphQL playground
-      introspection: true, // Enable introspection
+      playground: false, // Disable playground temporarily
+      introspection: false, // Disable introspection temporarily
       context: ({ req }) => ({ req }), // Pass request to context for auth
     }),
 

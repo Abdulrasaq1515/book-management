@@ -24,21 +24,20 @@ export class Book {
   id: string;
 
   @Field()
-  @Column({ type: 'text' })
+  @Column()
   title: string;
 
   @Field()
-  @Column({ type: 'text' })
+  @Column()
   author: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   description?: string;
 
   @Field(() => BookStatus)
   @Column({
-    type: 'text',
-    enum: BookStatus,
+    type: 'varchar',
     default: BookStatus.WANT_TO_READ,
   })
   status: BookStatus;
@@ -51,6 +50,6 @@ export class Book {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   createdBy?: string; // Auth0 user ID
 }

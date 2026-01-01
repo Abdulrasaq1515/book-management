@@ -10,13 +10,4 @@ export class HealthController {
       service: 'book-dashboard-backend',
     };
   }
-
-  @Get('health')
-  getHealthCheck() {
-    return {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      service: 'book-dashboard-backend',
-    };
-  }
 }
