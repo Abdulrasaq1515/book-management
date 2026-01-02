@@ -20,6 +20,8 @@
     "test": "cd backend && npm test"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "dotenv": "^8.2.0",
+    "node-fetch": "^3.3.2"
   }
 }
